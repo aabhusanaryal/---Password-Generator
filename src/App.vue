@@ -1,12 +1,37 @@
 <template>
   <!-- Dark mode toggle -->
-  <kbd
-    id="dark-mode-toggle"
-    @click="toggleDarkMode"
-    onselectstart="return false"
-    >{{ themeText }}</kbd
-  >
-
+  <div id="bottom-right">
+    <kbd @click="openAboutModal"><i class="fas fa-question"></i></kbd>&nbsp;
+    <kbd
+      id="dark-mode-toggle"
+      @click="toggleDarkMode"
+      onselectstart="return false"
+      >{{ themeText }}</kbd
+    >
+  </div>
+  <dialog id="about-modal">
+    <article>
+      <header>
+        <a @click="closeAboutModal" aria-label="Close" class="close"></a>
+        About गोप्य
+      </header>
+      <p>
+        गोप्य is a password generator that runs on your browser. It's built with
+        Vue.js. The passwords generation is done locally on your machine and
+        isn't sent to a server. This makes it a secure choice for generating
+        passwords.
+      </p>
+      <p>
+        Made by<a
+          href="http://aabhusanaryal.com.np"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Aabhusan Aryal</a
+        >.
+      </p>
+    </article>
+  </dialog>
   <header class="center-text">
     <hgroup>
       <h1>गोप्य</h1>
@@ -106,6 +131,7 @@ export default {
         digits: false,
       },
       themeText: "",
+      isModalOpen: false,
     };
   },
 
@@ -122,6 +148,42 @@ export default {
     });
   },
   methods: {
+    openAboutModal() {
+      this.isModalOpen = true;
+      let modal = document.querySelector("#about-modal");
+      document.querySelector("html").classList.add("modal-is-opening");
+      modal.setAttribute("open", "");
+      setTimeout(() => {
+        document
+          .querySelector("html")
+          .classList.replace("modal-is-opening", "modal-is-open");
+      }, 400);
+      addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && this.isModalOpen) {
+          this.closeAboutModal();
+        }
+      });
+      addEventListener("click", (e) => {
+        let modal = document.querySelector("#about-modal");
+        if (this.isModalOpen && modal === e.target) {
+          // This works becasue e.target is some children of modal whenever we click inside the
+          // main dialog card. If we click outside the dialog card, the target is the modal
+          // itself and hence modal===e.target evaluates to true. We want to close the modal
+          // when we click outside any of modal's children.
+          this.closeAboutModal();
+        }
+      });
+    },
+    closeAboutModal() {
+      this.isModalOpen = false;
+      let modal = document.querySelector("#about-modal");
+      document.querySelector("html").classList.remove("modal-is-open");
+      document.querySelector("html").classList.add("modal-is-closing");
+      setTimeout(() => {
+        modal.removeAttribute("open");
+        document.querySelector("html").classList.remove("modal-is-closing");
+      }, 400);
+    },
     setThemeText() {
       let htmlEl = document.querySelector("html");
       if (
@@ -256,9 +318,13 @@ export default {
 .center-text {
   text-align: center;
 }
-#dark-mode-toggle {
+#bottom-right {
   position: absolute;
   bottom: 20px;
   right: 20px;
+}
+#dark-mode-toggle {
+  width: 120px;
+  text-align: center;
 }
 </style>
