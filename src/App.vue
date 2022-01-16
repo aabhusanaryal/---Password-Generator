@@ -231,7 +231,7 @@ export default {
       if (!(this.special || this.lowercase || this.uppercase || this.digits)) {
         // If all the switches are off
         pass = "Whom are we fooling here?";
-        this.tempPass = pass;
+        this.password = pass;
         return pass;
       }
       this.has = {
